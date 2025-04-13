@@ -1,17 +1,14 @@
+
 import axios from "axios";
 
-// Verifica si la variable se está leyendo correctamente
-console.log("✅ API URL:", import.meta.env.VITE_API_URL);
-
+// Usamos la variable de entorno para la URL de la API
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:4000/api", // Valor por defecto en desarrollo
 });
 
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) req.headers.Authorization = `Bearer ${token}`;
   return req;
 });
 
