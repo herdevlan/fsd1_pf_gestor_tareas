@@ -14,5 +14,15 @@ module.exports = {
         rejectUnauthorized: false, // Importante para Render
       },
     },
-  }
+  },
+  production: {
+    use_env_variable: 'DATABASE_URL',  // Usamos DATABASE_URL en producción
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // Requerido por Render para conexión segura
+      },
+    },
+  },
 };
