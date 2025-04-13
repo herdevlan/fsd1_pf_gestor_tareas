@@ -11,17 +11,25 @@ const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  // Si use_env_variable está presente, usa la variable de entorno para conectarse
+  const databaseUrl = process.env[config.use_env_variable];
+  if (databaseUrl) {
+    sequelize = new Sequelize(databaseUrl, config);
+  } else {
+    console.error('❌ DATABASE_URL no está definida en las variables de entorno');
+    process.exit(1); // Detiene la ejecución si no se puede obtener la URL de la base de datos
+  }
 } else {
+  // Si no se usa una variable de entorno, usa las credenciales proporcionadas directamente
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-//  VER CONEXION
+// Verificar la conexión a la base de datos
 sequelize.authenticate()
   .then(() => console.log('✅ Conectado a PostgreSQL'))
   .catch((err) => console.error('❌ Error al conectar a PostgreSQL:', err));
 
-
+// Cargar los modelos desde la carpeta actual
 fs
   .readdirSync(__dirname)
   .filter(file => {
@@ -37,6 +45,7 @@ fs
     db[model.name] = model;
   });
 
+// Establecer las asociaciones entre los modelos
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
