@@ -1,28 +1,32 @@
-# Etapa 1: Build del frontend (React CRA)
+# Etapa 1: Construcción del frontend (React con CRA)
 FROM node:18 AS frontend-build
 WORKDIR /app/frontend
+
+# Copiar e instalar dependencias del frontend
 COPY frontend/package*.json ./
 RUN npm install
+
+# Copiar el código fuente y compilar
 COPY frontend/ .
 RUN npm run build
 
-# Etapa 2: Backend + frontend
+# Etapa 2: Construcción del contenedor final con backend + frontend
 FROM node:18
 WORKDIR /app
 
-# Backend
+# Copiar e instalar dependencias del backend
 COPY backend/package*.json ./backend/
 RUN cd backend && npm install
 
-# Copiar código backend
+# Copiar el código fuente del backend
 COPY backend ./backend
 
-# Copiar frontend compilado
+# Copiar el frontend ya compilado desde la etapa anterior
 COPY --from=frontend-build /app/frontend/build ./frontend/build
 
-# Variables y puertos
+# Configurar variables y puerto expuesto
 ENV PORT=3000
 EXPOSE 3000
 
-# Comando para iniciar backend
+# Comando de inicio del servidor backend
 CMD ["node", "backend/index.js"]
